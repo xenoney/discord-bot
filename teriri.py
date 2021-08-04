@@ -1,13 +1,17 @@
 import os
 import random
-
 from discord.ext import commands
-from dotenv import load_dotenv
+from discord_slash import SlashCommand, SlashContext
+from keep_alive import keep_alive
 
-load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
 
+token = os.environ['TOKEN']
 bot = commands.Bot(command_prefix='-')
+slash_client = SlashCommand(bot)
+
+@slash_client.slash(name="helo")
+async def _slash_hello(ctx: SlashContext):
+    await ctx.send(content="Hello!")
 
 @bot.event
 async def on_ready():
@@ -39,7 +43,7 @@ async def _hug(ctx, *, arg: str = ''):
 
     if arg == '':
         hug = 'ぎゅってしたい！'
-        response = f'{member} が ' + hug
+        response = f'{member} が' + hug
     else:
         hugs = [
             'を抱きしめる〜♡',
@@ -49,4 +53,21 @@ async def _hug(ctx, *, arg: str = ''):
 
     await ctx.send(response)
 
+@bot.command(name='kill', help='誰をころしたいの？')
+async def _kill(ctx, *, arg: str = ''):
+    member = ctx.author.mention
+
+    if arg == '':
+        msg = '殺気を感じる...'
+        response = f'{member} から' + msg
+    else:
+        msgs = [
+            f'{member} が {arg} をころす気だぞ！',
+            f'{arg} はテリリが守ります！',
+        ]
+        response = random.choice(msgs)
+
+    await ctx.send(response)
+
+keep_alive()
 bot.run(token)
